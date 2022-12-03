@@ -15,5 +15,9 @@ module {
          #AmountTooSmall;
     };
   };  
+   public type CallResult = {
+        #reply: Blob;
+        #proposal: Nat; //sha256 of ["wallet_proposal"] + [Principal of self] + ["nonce"] + [stable Nonce]
+    };
 };
 

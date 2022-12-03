@@ -1,6 +1,7 @@
 import Account "mo:conversion_library/Account";
 import Map "mo:hashmap/Map";
 import Cycles "mo:base/ExperimentalCycles";
+import ExpIC "mo:base/ExperimentalInternetComputer";
 import Debug "mo:base/Debug";
 import Error "mo:base/Error";
 import Iter "mo:base/Iter";
@@ -18,8 +19,9 @@ import Utils "./Utils";
 
 actor class Wallet(_owner:Principal) = this
 {
+  
+  public type CallResult = T.CallResult;
   var owner:Principal = _owner;
-
   var icp_fee:Nat64 = 10000;
   let {thash} = Map;
   let icp_approval_map= Map.new<Text,Nat64>();
@@ -28,6 +30,11 @@ actor class Wallet(_owner:Principal) = this
   var tx_count:Nat = 0;
  
 
+  public shared({caller}) func call(_principal:Principal,_function:Text,_data:Blob): async CallResult 
+  {
+    var expICCall = await ExpIC.call(_principal,_function,_data);
+    return #reply(expICCall);
+  };
   public shared({caller}) func cycles_balance() : async Nat {
     assert(caller == owner);
     var canister_status = await managementActor.canister_status({canister_id = Principal.fromActor(this)});

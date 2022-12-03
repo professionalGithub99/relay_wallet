@@ -10,7 +10,7 @@ let
     dependencies = ["base"],
     name = "conversion_library",
     repo = "https://github.com/professionalGithub99/conversion_library.git",
-    version = "main"
+    version = "v0.0.3"
     },
     {
     dependencies = ["base"],

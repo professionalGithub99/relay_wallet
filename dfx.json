@@ -16,6 +16,11 @@
       "type": "motoko",
       "dependencies":["ledger"]
     },
+    "wallet":{
+      "main":"src/relay_wallet_backend/Wallet.mo",
+      "type":"motoko",
+      "dependencies":["ledger"]
+    },
     "relay_wallet_frontend": {
       "dependencies": [
         "relay_wallet_backend"

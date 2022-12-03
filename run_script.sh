@@ -1,0 +1,1 @@
+dfx canister call ledger transfer '(record {memo = 1;amount = record {e8s = 1000000000}; fee = record {e8s = 10000}; from_subaccount=null;to= blob "\86=9\8e\bay\ae\f8R\bb\18\a9\ef\a6K\ab:\60\d8\9a9P\1d\e2\e8J}\a9\014wz";created_at_time = null})'

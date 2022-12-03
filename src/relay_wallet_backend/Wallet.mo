@@ -1,12 +1,15 @@
 import Account "mo:conversion_library/Account";
-import Nat64 "mo:base/Nat64";
-import Ledger "canister:ledger";
+import Map "mo:hashmap/Map";
 import Cycles "mo:base/ExperimentalCycles";
+import Debug "mo:base/Debug";
 import Error "mo:base/Error";
+import Iter "mo:base/Iter";
+import Ledger "canister:ledger";
+import Nat64 "mo:base/Nat64";
 import Principal "mo:base/Principal";
 import T "./Types";
 import IC "./IC";
-import Map "mo:hashmap/Map";
+import Management "./Management";
 import Utils "./Utils";
 
 
@@ -21,15 +24,22 @@ actor class Wallet(_owner:Principal) = this
   let {thash} = Map;
   let icp_approval_map= Map.new<Text,Nat64>();
   let ic = actor("aaaaa-aa"):IC.IC;
+  let managementActor = actor("aaaaa-aa"):Management.Self;
   var tx_count:Nat = 0;
+ 
 
+  public shared({caller}) func cycles_balance() : async Nat {
+    assert(caller == owner);
+    var canister_status = await managementActor.canister_status({canister_id = Principal.fromActor(this)});
+    return canister_status.cycles;      
+  };
   func _default_account_blob():Blob
   {
     let account = Account.accountIdentifier(Principal.fromActor(this),Account.defaultSubaccount());
     return account;
   };
 
-  public query func default_account():async Text
+public func default_account():async Text
   {
     var accountIdBlob = _default_account_blob();
     return Account.accountIdBlobToText(accountIdBlob);
@@ -38,6 +48,10 @@ actor class Wallet(_owner:Principal) = this
   public query func default_account_blob():async Blob
   {
      return _default_account_blob();
+  };
+  public query func get_approval_map():async [(Text,Nat64)]
+  {
+    return Iter.toArray(Map.entries<Text,Nat64>(icp_approval_map));
   };
 
   //approve first checks whether _from_subaccount is a 32 byte array
@@ -114,12 +128,14 @@ transfer_response:= await Ledger.transfer(_transfer_args);
         };
         switch(Map.get(icp_approval_map,thash,text_hash)){
           case(? amount_approved){
-            if(amount_approved <= (_transfer_args.fee.e8s + _transfer_args.amount.e8s)){
+            if(amount_approved >= (_transfer_args.fee.e8s + _transfer_args.amount.e8s)){
               //subtract and remove amount first
               approved_amount := amount_approved;
               var attempted_transfer_amount:Nat64 = 0;
               attempted_transfer_amount := (_transfer_args.fee.e8s + _transfer_args.amount.e8s);
+              Debug.print("attempted_transfer_amount"#debug_show(attempted_transfer_amount));
               var prev_value = Utils.remove_or_put<Text,Nat64>(Utils.isZeroNat64,icp_approval_map,thash,text_hash, approved_amount - attempted_transfer_amount);
+              Debug.print("prev_value"#debug_show(prev_value));
               //THERE IS A LOGICAL REASON FOR US TO SUBTRACT THE AMOUNT FIRST!!!
               //IN THE OFF CHANCE THE LEDGER SENDS ICP BUT IS UNABLE TO REMOVE FROM THE APPROVAL ALLOWANCE, THE APPROVED PERSON MAY BE ABLE TO SEND TWICE THE APPROVED AMOUNT.
               //IN THE CASE WHERE WE SUBTRACT APPROVAL FIRST, THEN RE-ADD THE AMOUNT IF THERE IS A TRANSFER FAILURE, THIS CASE IS NOT AS BAD

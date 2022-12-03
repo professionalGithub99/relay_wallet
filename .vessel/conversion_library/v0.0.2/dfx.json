@@ -1,0 +1,27 @@
+{
+  "canisters": {
+    "ledger":{
+      "type":"custom",
+      "wasm":"src/ledger/ledger.wasm",
+      "candid":"src/ledger/ledger.did",
+      "remote": {
+    "candid": "src/ledger/ledger.public.did",
+    "id": {
+      "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+    }
+    }
+    },
+    "test":{
+      "main":"src/test/main.mo",
+      "type":"motoko",
+      "dependencies":["ledger"]
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": "vessel sources"
+    }
+  },
+  "version": 1
+}

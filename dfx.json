@@ -1,0 +1,43 @@
+{
+  "canisters": {
+    "ledger":{
+      "type":"custom",
+      "wasm":"src/relay_wallet_backend/ledger/ledger.wasm",
+      "candid":"src/relay_wallet_backend/ledger/ledger.did",
+      "remote": {
+    "candid": "src/relay_wallet_backend/ledger.public.did",
+    "id": {
+      "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+    }
+  }
+    },
+    "relay_wallet_backend": {
+      "main": "src/relay_wallet_backend/main.mo",
+      "type": "motoko",
+      "dependencies":["ledger"]
+    },
+    "relay_wallet_frontend": {
+      "dependencies": [
+        "relay_wallet_backend"
+      ],
+      "frontend": {
+        "entrypoint": "src/relay_wallet_frontend/src/index.html"
+      },
+      "source": [
+        "src/relay_wallet_frontend/assets",
+        "dist/relay_wallet_frontend/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "replica":{
+      "subnet_type":"system"
+    },
+    "build": {
+      "args": "",
+      "packtool": "vessel sources"
+    }
+  },
+  "version": 1
+}

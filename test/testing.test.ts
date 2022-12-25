@@ -99,62 +99,70 @@ console.log("seedIcpActorBalance",seedIcpActorBalance);
 //then check the balance of the seedpPrincipals wallet
 const seedIcpActorTransfer = await seedIcpActor.transfer({memo:1,amount:{e8s:100000000},fee:{e8s:10000},from_subaccount:[],to:seedWalletDefaultAccountIdBlob,created_at_time:[]});
 const seedIcpActorBalance1 = await seedIcpActor.account_balance({account:seedPrincipalDefaultAccountIdBlob});
-var seedActorWalletBalance = await seedIcpActor.account_balance({account:seedWalletDefaultAccountIdBlob});
+var seedWalletBalance = await seedIcpActor.account_balance({account:seedWalletDefaultAccountIdBlob});
 console.log("seedIcpActorBalance1",seedIcpActorBalance1);
-console.log("seedActorWalletBalance",seedActorWalletBalance);
+console.log("seedWalletBalance",seedWalletBalance);
 
 
 //___TODO:change the seedprincipal approval of seedprincipal2 to approve seedprincipal2's wallet instead, then use call raw on seedprincipal2's wallet to send icp to itself form seedprincipal1's wallet____// 
 //approve seedprincipal wallet to allow seedPrincipal2 to send to seedprincpal2's wallet 
 //view the approvals of seedPrincipal1's wallet
 //transfer the amount to seedPrincipal2's wallet
-const seedActorWalletApprove = await seedWalletActor.approve(seedPrincipal2,[],10000000);
-var seedActorWalletApprovalMap = await seedWalletActor.get_approval_map();
-console.log("seedActorWalletApprovalMap",seedActorWalletApprovalMap);
-var seedActor2WalletApprovalMap = await seedWalletActor2.get_approval_map();
-console.log("seedActor2WalletApprovalMap",seedActor2WalletApprovalMap);
+const seedWalletApproveActor = await seedWalletActor.approve(seedPrincipal2,[],10000000);
+var seedWalletApprovalMap = await seedWalletActor.get_approval_map();
+console.log("seedWalletApprovalMap",seedWalletApprovalMap);
+var seedWalletApprovalMapAsActor2 = await seedWalletActor2.get_approval_map();
+console.log("seedWalletApprovalMapAsActor2",seedWalletApprovalMapAsActor2);
 
 //try to transfer using seedPrincipal2 with wallet 1
-var seedActor2WalletTransfer = await seedWalletActor2.transfer({memo:1,amount:{e8s:490000},fee:{e8s:10000},from_subaccount:[],to:seedWallet2DefaultAccountIdBlob,created_at_time:[]});
+var seedWalletTransferAsActor2 = await seedWalletActor2.transfer({memo:1,amount:{e8s:490000},fee:{e8s:10000},from_subaccount:[],to:seedWallet2DefaultAccountIdBlob,created_at_time:[]});
 //view the balance of seedPrincipal2's wallet
 //make sure the balance of seedPrincipal1's wallet has been updated along with the approval hashmap
-var seedActor2WalletBalance = await seedIcpActor2.account_balance({account:seedWallet2DefaultAccountIdBlob});
-seedActorWalletBalance = await seedIcpActor.account_balance({account:seedWalletDefaultAccountIdBlob});
-seedActorWalletApprovalMap = await seedWalletActor.get_approval_map();
+var seedWalletBalanceAsActor2 = await seedIcpActor2.account_balance({account:seedWallet2DefaultAccountIdBlob});
+seedWalletBalance = await seedIcpActor.account_balance({account:seedWalletDefaultAccountIdBlob});
+seedWalletApprovalMap = await seedWalletActor.get_approval_map();
 
-console.log("seedActor2WalletTransfer",seedActor2WalletTransfer);
-console.log("seedActor2WalletBalance",seedActor2WalletBalance);
-console.log("seedActorWalletBalance",seedActorWalletBalance);
-console.log("seedActorWalletApprovalMap",seedActorWalletApprovalMap);
-
+console.log("seedWalletTransferAsActor2",seedWalletTransferAsActor2);
+console.log("seedWalletBalanceAsActor2",seedWalletBalanceAsActor2);
+console.log("seedWalletBalance",seedWalletBalance);
+console.log("seedWalletApprovalMap",seedWalletApprovalMap);
 
 //transfer an unauthorized amount from seedPrincipal1's wallet to seedPrincipal2's wallet as seedPrincipal2
-seedActor2WalletTransfer = await seedWalletActor2.transfer({memo:1,amount:{e8s:9490001},fee:{e8s:10000},from_subaccount:[],to:seedWallet2DefaultAccountIdBlob,created_at_time:[]});
+seedWalletTransferAsActor2 = await seedWalletActor2.transfer({memo:1,amount:{e8s:9490001},fee:{e8s:10000},from_subaccount:[],to:seedWallet2DefaultAccountIdBlob,created_at_time:[]});
 //view the balance of seedPrincipal2's wallet
 //make sure the balance of seedPrincipal1's wallet has been updated along with the approval hashmap
-seedActor2WalletBalance = await seedIcpActor2.account_balance({account:seedWallet2DefaultAccountIdBlob});
-seedActorWalletBalance = await seedIcpActor.account_balance({account:seedWalletDefaultAccountIdBlob});
-seedActorWalletApprovalMap = await seedWalletActor.get_approval_map();
-console.log("seedActor2WalletTransfer should be unauthorized",seedActor2WalletTransfer);
-console.log("seedActor2WalletBalance",seedActor2WalletBalance);
-console.log("seedActorWalletBalance",seedActorWalletBalance);
-console.log("seedActorWalletApprovalMap",seedActorWalletApprovalMap);
+seedWalletBalanceAsActor2 = await seedIcpActor2.account_balance({account:seedWallet2DefaultAccountIdBlob});
+seedWalletBalance = await seedIcpActor.account_balance({account:seedWalletDefaultAccountIdBlob});
+seedWalletApprovalMap = await seedWalletActor.get_approval_map();
+console.log("seedWalletTransferAsActor2 should be unauthorized",seedWalletTransferAsActor2);
+console.log("seedWalletBalanceAsActor2",seedWalletBalanceAsActor2);
+console.log("seedWalletBalance",seedWalletBalance);
+console.log("seedWalletApprovalMap",seedWalletApprovalMap);
 
 //transfer from seedPrincipal1's wallet to seedPrincipal2's wallet as seedPrincipal1
-const seedActorWalletTransfer = await seedWalletActor.transfer({memo:1,amount:{e8s:490000},fee:{e8s:10000},from_subaccount:[],to:seedWallet2DefaultAccountIdBlob,created_at_time:[]});
-seedActor2WalletBalance = await seedIcpActor2.account_balance({account:seedWallet2DefaultAccountIdBlob});
-seedActorWalletBalance = await seedIcpActor.account_balance({account:seedWalletDefaultAccountIdBlob});
-seedActorWalletApprovalMap = await seedWalletActor.get_approval_map();
-console.log("transfer from seedPrincipal1's wallet to seedPrincipal2's wallet as seedPrincipal1",seedActorWalletTransfer);
-console.log("seedActor2WalletBalance",seedActor2WalletBalance);
-console.log("seedActorWalletBalance",seedActorWalletBalance);
-console.log("seedActorWalletApprovalMap",seedActorWalletApprovalMap);
-
+const seedWalletTransferAsActor = await seedWalletActor.transfer({memo:1,amount:{e8s:490000},fee:{e8s:10000},from_subaccount:[],to:seedWallet2DefaultAccountIdBlob,created_at_time:[]});
+seedWalletBalanceAsActor2 = await seedIcpActor2.account_balance({account:seedWallet2DefaultAccountIdBlob});
+seedWalletBalance = await seedIcpActor.account_balance({account:seedWalletDefaultAccountIdBlob});
+seedWalletApprovalMap = await seedWalletActor.get_approval_map();
+console.log("transfer from seedPrincipal1's wallet to seedPrincipal2's wallet as seedPrincipal1",seedWalletTransferAsActor);
+console.log("seedWalletBalanceAsActor2",seedWalletBalanceAsActor2);
+console.log("seedWalletBalance",seedWalletBalance);
+console.log("seedWalletApprovalMap",seedWalletApprovalMap);
 
 //__todo try flushing the approval aka the full amount left to send.
 //__todo try to approve more than the wallet holds, try to send more then wallet holds 
 //__todo try to approve more than wallet holds try to send less than wallet holds
 
+const seedWalletActor2Transfer = await seedWalletActor2.transfer({memo:1,amount:{e8s:9490000},fee:{e8s:10000},from_subaccount:[],to:seedWallet2DefaultAccountIdBlob,created_at_time:[]});
+seedWalletBalanceAsActor2 = await seedIcpActor2.account_balance({account:seedWallet2DefaultAccountIdBlob});
+seedWalletBalance = await seedIcpActor.account_balance({account:seedWalletDefaultAccountIdBlob});
+seedWalletApprovalMap = await seedWalletActor.get_approval_map();
+var seedWallet2Balance = await seedIcpActor2.account_balance({account:seedWallet2DefaultAccountIdBlob});
+console.log("transfer from seedPrincipal1's wallet to seedPrincipal2's wallet as seedPrincipal1",seedWalletTransferAsActor);
+console.log("seedWalletBalanceAsActor2",seedWalletBalanceAsActor2);
+console.log("seedWalletBalance",seedWalletBalance);
+console.log("seedWalletApprovalMap",seedWalletApprovalMap);
+console.log("seedWallet2Balance",seedWallet2Balance);
 },50000);
 
 /*const seedActorPrincipalText = await seedActor.caller_principal_to_account_id_text();

@@ -1,5 +1,6 @@
 import Account "mo:conversion_library/Account";
 import Map "mo:hashmap/Map";
+import Array "mo:base/Array";
 import Cycles "mo:base/ExperimentalCycles";
 import ExpIC "mo:base/ExperimentalInternetComputer";
 import Debug "mo:base/Debug";
@@ -8,6 +9,7 @@ import Iter "mo:base/Iter";
 import Ledger "canister:ledger";
 import Nat64 "mo:base/Nat64";
 import Principal "mo:base/Principal";
+import Result "mo:base/Result";
 import T "./Types";
 import IC "./IC";
 import Management "./Management";
@@ -21,15 +23,67 @@ actor class Wallet(_owner:Principal) = this
 {
   
   public type CallResult = T.CallResult;
+  public type ConfigureWalletCommand = T.ConfigureWalletCommand;
+  public type ConfigureWalletResponse = T.ConfigureWalletResponse;
+  public type ConfigureWalletError = T.ConfigureWalletError;
   var owner:Principal = _owner;
   var icp_fee:Nat64 = 10000;
-  let {thash} = Map;
+  let {thash;phash} = Map;
   let icp_approval_map= Map.new<Text,Nat64>();
   let ic = actor("aaaaa-aa"):IC.IC;
   let managementActor = actor("aaaaa-aa"):Management.Self;
   var tx_count:Nat = 0;
- 
+  var tokens:[{principal:Principal;standard:Text;symbol:Text}] = [];
+  var nfts:[{principal:Principal;standard:Text;symbol:Text}] = [];
+  var allowed:[{principal:Principal;function:Text;service:Text}] = [];
 
+  public func configure_wallet(command:ConfigureWalletCommand): async Result.Result<ConfigureWalletResponse,ConfigureWalletError>
+  {
+    switch (command)
+    {
+      case(#addToken token)
+      {
+        //check if token already exists
+        var exists = Array.find<{principal:Principal;standard:Text;symbol:Text}>(tokens,func (t) : Bool {t.standard == token.standard and t.symbol == token.symbol and t.principal == token.principal});
+        if(exists == null)
+        {
+        return #err(#TokenAlreadyAdded);
+        }
+        else
+        {
+          var new_tokens:[{principal:Principal;standard:Text;symbol:Text}] =[token];
+          tokens := Array.append<{principal:Principal;standard:Text;symbol:Text}>(tokens,new_tokens);
+          return #ok(#TokenAdded);
+        };
+      };
+      case(#removeToken token)
+      {
+      };
+      case(#addNNSNeuron neuron)
+      {
+      };
+      case(#removeNNSNeuron neuron)
+      {
+      };
+      case(#addSNSNeuron neuron)
+      {
+      };
+      case(#removeSNSNeuron neuron)
+      {
+      };
+      case(#addNFT nft)
+      {
+      };
+      case(#removeNFT nft)
+      {
+      };
+      case(#addAllow allowed_function)
+      {
+        
+      };
+    };
+    return #err(#Other);
+  };  
   public shared({caller}) func call(_principal:Principal,_function:Text,_data:Blob): async CallResult 
   {
     var expICCall = await ExpIC.call(_principal,_function,_data);
